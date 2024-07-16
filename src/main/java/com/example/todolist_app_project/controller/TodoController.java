@@ -21,8 +21,8 @@ public class TodoController {
 
     // 새로운 Todo 항목 추가
     @PostMapping
-    public void createTodo(@RequestBody String todoName) {
-        todoService.create(todoName);
+    public void createTodo(@RequestBody TodoRequest todoRequest) {
+        todoService.create(todoRequest.getTodoName());
     }
 
     // Todo 항목 업데이트 (완료 상태 변경)
