@@ -1,16 +1,18 @@
-function TodoInput(props) {
+import React from 'react';
+
+function TodoInput({ handleSubmit, input, handleChange }) {
     return (
-        <form onSubmit={props.handleSubmit}>
+        <form onSubmit={handleSubmit}>
             <label>
                 Todo &nbsp;
                 <input
                     type="text"
-                    required={true}
-                    value={props.input}
-                    onChange={props.handleChange}
+                    required
+                    value={input}
+                    onChange={handleChange}
                 />
             </label>
-            <input type="submit" value="Create"/>
+            <input type="submit" value="Create" />
         </form>
     );
 }

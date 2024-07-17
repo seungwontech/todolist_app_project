@@ -10,92 +10,70 @@ function App() {
     const [todoList, setTodoList] = useState([]);
     const [input, setInput] = useState("");
 
+    // 컴포넌트가 처음 로드될 때 todo 리스트를 가져옴
     useEffect(() => {
         getTodoList();
     }, []);
 
-    async function getTodoList() {
-        await axios
-            .get(baseUrl + "/todo")
-            .then((response) => {
-                setTodoList(response.data);
-            })
-            .catch((error) => {
-                console.error(error)
-            })
-    }
+    // todo 리스트를 가져오는 함수
+    const getTodoList = async () => {
+        try {
+            const response = await axios.get(baseUrl + "/todo");
+            setTodoList(response.data);
+        } catch (error) {
+            console.error("할 일 목록을 가져오는 중 오류 발생:", error);
+        }
+    };
 
-    function createTodo(e) {
+    // 새로운 todo 추가 함수
+    const createTodo = async (e) => {
         e.preventDefault();
-        const createTodo = async () => {
-            await axios
-                .post(baseUrl + "/todo", {
-                    todoName: input
-                })
-                .then((response) => {
-                    setInput("");
-                    getTodoList();
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+        try {
+            await axios.post(baseUrl + "/todo", {todoName: input});
+            setInput("");
+            await getTodoList();
+        } catch (error) {
+            console.error("할 일을 추가하는 중 오류 발생:", error);
         }
-        createTodo();
-    }
+    };
 
-    function updateTodo(id) {
-        const updateTodo = async () => {
-            await axios
-                .put(baseUrl + "/todo/" + id, {})
-                .then((response) => {
-                    setTodoList(
-                        todoList.map((todo) => todo.id === id ? {...todo, completed: !todo.completed} : todo)
-                    );
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+    // todo 업데이트 함수
+    const updateTodo = async (id) => {
+        try {
+            await axios.put(baseUrl + "/todo/" + id, {});
+            setTodoList(todoList.map(todo =>
+                todo.id === id ? {...todo, completed: !todo.completed} : todo
+            ));
+        } catch (error) {
+            console.error("할 일을 업데이트하는 중 오류 발생:", error);
         }
-        updateTodo();
-    }
+    };
 
-    function deleteTodo(id) {
-        const updateTodo = async () => {
-            await axios
-                .delete(baseUrl + "/todo/" + id, {})
-                .then((response) => {
-                    setTodoList(
-                        todoList.filter((todo) => todo.id !== id)
-                    );
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+    // todo 삭제 함수
+    const deleteTodo = async (id) => {
+        try {
+            await axios.delete(baseUrl + "/todo/" + id, {});
+            setTodoList(todoList.filter(todo => todo.id !== id));
+        } catch (error) {
+            console.error("할 일을 삭제하는 중 오류 발생:", error);
         }
-        updateTodo();
-    }
+    };
 
-    function changeText(e) {
+    // 입력값 변경 함수
+    const changeText = (e) => {
         e.preventDefault();
-        setInput(e.target.value)
-    }
+        setInput(e.target.value);
+    };
 
     return (
         <div className="App">
             <h1>TODO LIST</h1>
             <TodoInput handleSubmit={createTodo} input={input} handleChange={changeText}/>
-
-            {
-                todoList
-                    ? todoList.map((todo) => {
-                        return (
-                            <TodoList key={todo.id} todo={todo}
-                                      handleClick={() => updateTodo(todo.id)}
-                                      handleDelete={() => deleteTodo(todo.id)}/>
-                        )
-                    })
-                    : null
-            }
+            <TodoList
+                todoList={todoList}
+                updateTodo={updateTodo}
+                deleteTodo={deleteTodo}
+            />
         </div>
     );
 }
